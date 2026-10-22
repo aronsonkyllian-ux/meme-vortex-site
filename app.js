@@ -43,7 +43,21 @@ async function load() {
 
 function render() {
   try { renderStatus(); } catch(e){console.error(e)}
+  try { renderSilence(); } catch(e){console.error(e)}
   for (const fn of [renderPulse, renderRadar, renderFlow, renderBook, renderCrew, renderCore]) { try { fn(); } catch (e) { console.error(e); } }
+}
+
+/* ---------------- engine-silence banner: client-side only, re-evaluated every 15 s even if fetches fail */
+const SILENCE_S = 300;
+function renderSilence() {
+  const el = $("#silence"); if (!el) return;
+  const hb = D.status && D.status.heartbeat_ts;
+  const age = hb ? Date.now()/1000 - hb : null;
+  if (age != null && age <= SILENCE_S) { el.hidden = true; return; }
+  const src = D.source === "worker" ? "" : " · Worker injoignable, données de secours";
+  el.textContent = age == null ? `⚠ Moteur silencieux : aucun battement reçu${src}`
+    : `⚠ Moteur silencieux depuis ${Math.floor(age/60)} min (dernier battement ${fmtT(hb)})${src}`;
+  el.hidden = false;
 }
 
 /* ---------------- header status */
@@ -52,7 +66,7 @@ function renderStatus() {
   if (!s) { pill.className = "pill bad"; t.textContent = "aucune donnée"; return; }
   const age = Date.now()/1000 - (s.heartbeat_ts || s.generated_ts);
   const feed = s.engine && s.engine.feed_ok;
-  if (age > 600) { pill.className = "pill bad"; t.textContent = `hors ligne · ${ago(s.heartbeat_ts)}`; }
+  if (age > SILENCE_S) { pill.className = "pill bad"; t.textContent = `hors ligne · ${ago(s.heartbeat_ts)}`; }
   else if (s.kill_switch) { pill.className = "pill bad"; t.textContent = "KILL actif"; }
   else if (!feed) { pill.className = "pill warn"; t.textContent = "flux dégradé"; }
   else { pill.className = "pill ok"; t.textContent = `en marche · ${fmtT(s.generated_ts)}`; }
@@ -298,6 +312,6 @@ function sky() {
     if (!still) requestAnimationFrame(f);
   })();
 }
-sky(); orbitFrame(); load(); setInterval(load, 60000);
+sky(); orbitFrame(); load(); setInterval(load, 60000); setInterval(() => { try { renderSilence(); } catch (e) {} }, 15000);
 document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
 })();

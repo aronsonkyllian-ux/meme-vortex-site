@@ -125,3 +125,8 @@ canvas#eqChart,canvas#orbit{width:100%;display:block}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 .sheet[hidden]{display:none}
 .empty[hidden]{display:none}
+
+/* engine-silence banner (heartbeat > 5 min) */
+.silence{position:sticky;top:0;z-index:50;margin:0 auto 10px;max-width:1100px;padding:12px 14px;border-radius:10px;
+  background:#c62828;color:#fff;font:700 15px/1.35 var(--mono);text-align:center;box-shadow:0 4px 18px rgba(198,40,40,.45)}
+.silence[hidden]{display:none}
