@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07060d">
+<meta name="robots" content="noindex">
+<title>MEME VORTEX — observatoire</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%2307060d'/%3E%3Cpath d='M32 8a24 24 0 1 1-17 7' stroke='%23ff8a4c' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M32 18a14 14 0 1 1-10 4' stroke='%2322d3ee' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%23ffd166'/%3E%3C/svg%3E">
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+
+<header class="top">
+  <div class="brand">
+    <canvas id="disk" width="88" height="88" aria-hidden="true"></canvas>
+    <div>
+      <h1>MEME<span>VORTEX</span></h1>
+      <p class="sub">Observatoire · Solana · Pump.fun</p>
+    </div>
+  </div>
+  <div class="pills">
+    <span class="pill mode" id="modePill">PAPER</span>
+    <span class="pill" id="livePill"><i class="dot"></i><b id="liveTxt">…</b></span>
+  </div>
+</header>
+
+<main>
+  <!-- ============ PULSE ============ -->
+  <section class="tab active" id="t-pulse" data-tab="pulse">
+    <div class="hero card glow">
+      <div class="hero-l">
+        <label>Capital papier total</label>
+        <div class="big" id="hEquity">—</div>
+        <div class="delta" id="hPnl">—</div>
+      </div>
+      <div class="hero-r">
+        <div><label>Frais payés</label><b id="hFees">—</b></div>
+        <div><label>Drawdown max</label><b id="hDD">—</b></div>
+        <div><label>Trades clos</label><b id="hTrades">—</b></div>
+      </div>
+      <p class="note">Net de tous les coûts simulés : frais de courbe 1,25 % (mesurés on-chain), frais réseau + priorité, rent ATA, slippage, latence. Valorisation des positions = valeur de liquidation, pas le prix affiché.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><h2>Courbe d'équité</h2><div class="seg" id="eqMode"><button data-m="abs" class="on">SOL</button><button data-m="pct">%</button></div></div>
+      <div class="chart-wrap"><canvas id="eqChart" height="220"></canvas><div class="empty" id="eqEmpty" hidden>La courbe apparaîtra après les premiers instantanés d'équité (1/min).</div></div>
+      <div class="legend" id="eqLegend"></div>
+    </div>
+
+    <h3 class="sec">Stratégies <small>chacune son sous-compte papier</small></h3>
+    <div id="strats" class="strats"></div>
+  </section>
+
+  <!-- ============ RADAR ============ -->
+  <section class="tab" id="t-radar" data-tab="radar">
+    <div class="card orbit-card">
+      <div class="card-h"><h2>Radar d'orbite</h2><span class="muted" id="rateTxt"></span></div>
+      <canvas id="orbit" height="320"></canvas>
+      <div class="orbit-key"><span><i class="k k-new"></i>détecté</span><span><i class="k k-watch"></i>surveillé</span><span><i class="k k-cand"></i>candidat</span><span><i class="k k-grad"></i>gradué</span><span><i class="k k-pos"></i>en position</span></div>
+    </div>
+    <div class="stagebar" id="stageBar"></div>
+    <h3 class="sec">Sous surveillance <small>dernière heure</small></h3>
+    <div id="watched" class="list"></div>
+    <h3 class="sec">Derniers lancements détectés</h3>
+    <div id="recent" class="list compact"></div>
+  </section>
+
+  <!-- ============ FLOW ============ -->
+  <section class="tab" id="t-flow" data-tab="flow">
+    <h3 class="sec">Signaux</h3>
+    <div id="signals" class="list"></div>
+    <h3 class="sec">Décisions clés</h3>
+    <div id="decisions" class="timeline"></div>
+    <h3 class="sec">Pourquoi on ne trade pas <small>24 h</small></h3>
+    <div id="reasons" class="bars"></div>
+    <h3 class="sec">Ordres</h3>
+    <div class="seg wide" id="ordFilter"><button data-f="all" class="on">Tous</button><button data-f="pending">En attente</button><button data-f="filled">Exécutés</button><button data-f="rej">Rejetés / échoués</button></div>
+    <div id="orders" class="list"></div>
+  </section>
+
+  <!-- ============ BOOK ============ -->
+  <section class="tab" id="t-book" data-tab="book">
+    <h3 class="sec">Positions ouvertes</h3>
+    <div id="positions" class="list"></div>
+    <h3 class="sec">Historique complet des trades</h3>
+    <div id="trades" class="list"></div>
+  </section>
+
+  <!-- ============ CREW ============ -->
+  <section class="tab" id="t-crew" data-tab="crew">
+    <div id="members" class="members"></div>
+    <h3 class="sec">Activité réelle de l'équipe</h3>
+    <div id="teamlog" class="timeline"></div>
+    <h3 class="sec">Recherche & améliorations</h3>
+    <div id="research"></div>
+    <h3 class="sec">Journal du moteur</h3>
+    <div id="events" class="timeline small"></div>
+  </section>
+
+  <!-- ============ CORE ============ -->
+  <section class="tab" id="t-core" data-tab="core">
+    <div class="card"><div class="card-h"><h2>État du système</h2></div><div id="sys" class="kv"></div></div>
+    <div class="card"><div class="card-h"><h2>Interruptions enregistrées</h2></div><p class="note">Quand le moteur ne tourne pas (box en pause, redémarrage), rien n'est inventé ni rattrapé : l'intervalle est consigné ici et les positions concernées sont marquées « tainted ».</p><div id="downtime" class="list compact"></div></div>
+    <div class="card"><div class="card-h"><h2>Sources & quotas</h2></div><div id="apis" class="list compact"></div></div>
+    <div class="card"><div class="card-h"><h2>Coûts simulés & garde-fous</h2></div><div id="costs" class="kv"></div></div>
+  </section>
+</main>
+
+<nav class="tabs" id="tabs">
+  <button data-t="pulse" class="on"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Pouls</span></button>
+  <button data-t="radar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 12l6-6"/></svg><span>Radar</span></button>
+  <button data-t="flow"><svg viewBox="0 0 24 24"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="18" cy="6" r="2"/><circle cx="15" cy="18" r="2"/></svg><span>Flux</span></button>
+  <button data-t="book"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Carnet</span></button>
+  <button data-t="crew"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 20c1-4 9-4 10 0M11 20c1-4 9-4 10 0"/></svg><span>Équipe</span></button>
+  <button data-t="core"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg><span>Système</span></button>
+</nav>
+
+<div class="sheet" id="sheet" hidden><div class="sheet-in"><button class="x" id="sheetX" aria-label="Fermer">×</button><div id="sheetBody"></div></div></div>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
